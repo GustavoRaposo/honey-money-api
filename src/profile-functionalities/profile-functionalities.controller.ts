@@ -10,7 +10,7 @@ import {
 import { ProfileFunctionalitiesService } from './profile-functionalities.service';
 import { CreateProfileFunctionalityDto } from './dto/create-profile-functionality.dto';
 
-@Controller('profile-funcionalities')
+@Controller('profile-functionalities')
 export class ProfileFunctionalitiesController {
   constructor(
     private readonly profileFunctionalitiesService: ProfileFunctionalitiesService,

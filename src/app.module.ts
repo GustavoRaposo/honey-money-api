@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { ProfilesModule } from './profiles/profiles.module';
 import { FunctionalitiesModule } from './functionalities/functionalities.module';
 import { ProfileFunctionalitiesModule } from './profile-functionalities/profile-functionalities.module';
+import { UserProfilesModule } from './user-profiles/user-profiles.module';
 
 @Module({
   imports: [
@@ -15,7 +16,8 @@ import { ProfileFunctionalitiesModule } from './profile-functionalities/profile-
     AuthModule,
     ProfilesModule,
     FunctionalitiesModule,
-    ProfileFunctionalitiesModule
+    ProfileFunctionalitiesModule,
+    UserProfilesModule
   ],
   controllers: [AppController],
   providers: [AppService],

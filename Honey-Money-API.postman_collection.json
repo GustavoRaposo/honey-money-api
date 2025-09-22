@@ -43,7 +43,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"123456\"\n}"
+							"raw": "{\n  \"email\": \"{{test_user_email}}\",\n  \"password\": \"{{test_user_password}}\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/auth/login",
@@ -235,12 +235,12 @@
 							"raw": "{\n  \"name\": \"João Silva\",\n  \"email\": \"joao@example.com\",\n  \"password\": \"senha123\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/user",
+							"raw": "{{base_url}}/users",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"user"
+								"users"
 							]
 						},
 						"description": "Cria um novo usuário (rota pública)"
@@ -259,40 +259,15 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/user",
+							"raw": "{{base_url}}/users",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"user"
+								"users"
 							]
 						},
 						"description": "Lista todos os usuários (requer autenticação)"
-					},
-					"response": []
-				},
-				{
-					"name": "Get User by UUID",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/user/{{user_uuid}}",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"user",
-								"{{user_uuid}}"
-							]
-						},
-						"description": "Busca um usuário específico pelo UUID (requer autenticação)"
 					},
 					"response": []
 				},
@@ -308,12 +283,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/user/search?name=João&email=joao",
+							"raw": "{{base_url}}/users/search?name=João&email=joao",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"user",
+								"users",
 								"search"
 							],
 							"query": [
@@ -330,6 +305,31 @@
 							]
 						},
 						"description": "Busca usuários por nome e/ou email (requer autenticação)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by UUID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users/{{user_uuid}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"{{user_uuid}}"
+							]
+						},
+						"description": "Busca um usuário específico pelo UUID (requer autenticação)"
 					},
 					"response": []
 				},
@@ -353,49 +353,16 @@
 							"raw": "{\n  \"name\": \"João Silva Atualizado\",\n  \"email\": \"joao.novo@example.com\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/user/{{user_uuid}}",
+							"raw": "{{base_url}}/users/{{user_uuid}}",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"user",
+								"users",
 								"{{user_uuid}}"
 							]
 						},
 						"description": "Atualiza dados de um usuário (requer autenticação)"
-					},
-					"response": []
-				},
-				{
-					"name": "Update User Password",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{jwt_token}}",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"password\": \"novaSenha123\"\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/user/{{user_uuid}}",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"user",
-								"{{user_uuid}}"
-							]
-						},
-						"description": "Atualiza apenas a senha do usuário (requer autenticação)"
 					},
 					"response": []
 				},
@@ -411,12 +378,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/user/{{created_user_uuid}}",
+							"raw": "{{base_url}}/users/{{created_user_uuid}}",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"user",
+								"users",
 								"{{created_user_uuid}}"
 							]
 						},
@@ -426,6 +393,508 @@
 				}
 			],
 			"description": "Endpoints relacionados ao gerenciamento de usuários"
+		},
+		{
+			"name": "Profiles",
+			"item": [
+				{
+					"name": "Create Profile",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Salva o ID do perfil criado",
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('created_profile_id', response.id);",
+									"    console.log('ID do perfil criado salvo:', response.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Administrador\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/profiles",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"profiles"
+							]
+						},
+						"description": "Cria um novo perfil de usuário"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Profiles",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/profiles",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"profiles"
+							]
+						},
+						"description": "Lista todos os perfis disponíveis"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Profile by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/profiles/{{created_profile_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"profiles",
+								"{{created_profile_id}}"
+							]
+						},
+						"description": "Busca um perfil específico pelo ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Super Administrador\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/profiles/{{created_profile_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"profiles",
+								"{{created_profile_id}}"
+							]
+						},
+						"description": "Atualiza um perfil existente"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Profile",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/profiles/{{created_profile_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"profiles",
+								"{{created_profile_id}}"
+							]
+						},
+						"description": "Remove um perfil"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints relacionados ao gerenciamento de perfis de usuário"
+		},
+		{
+			"name": "Functionalities",
+			"item": [
+				{
+					"name": "Create Functionality",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Salva o ID da funcionalidade criada",
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('created_functionality_id', response.id);",
+									"    console.log('ID da funcionalidade criada salvo:', response.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Gerenciar Usuários\",\n  \"description\": \"Permite criar, editar e excluir usuários do sistema\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/functionalities",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"functionalities"
+							]
+						},
+						"description": "Cria uma nova funcionalidade do sistema"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Functionalities",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/functionalities",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"functionalities"
+							]
+						},
+						"description": "Lista todas as funcionalidades disponíveis"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Functionality by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/functionalities/{{created_functionality_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"functionalities",
+								"{{created_functionality_id}}"
+							]
+						},
+						"description": "Busca uma funcionalidade específica pelo ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Functionality",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Gerenciar Usuários Avançado\",\n  \"description\": \"Permite criar, editar, excluir e gerenciar permissões de usuários do sistema\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/functionalities/{{created_functionality_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"functionalities",
+								"{{created_functionality_id}}"
+							]
+						},
+						"description": "Atualiza uma funcionalidade existente"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Functionality",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/functionalities/{{created_functionality_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"functionalities",
+								"{{created_functionality_id}}"
+							]
+						},
+						"description": "Remove uma funcionalidade"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints relacionados ao gerenciamento de funcionalidades do sistema"
+		},
+		{
+			"name": "Profile Functionalities",
+			"item": [
+				{
+					"name": "Create Profile Functionality",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Salva o ID da associação criada",
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    if (Array.isArray(response) && response.length > 0) {",
+									"        pm.environment.set('created_profile_functionality_id', response[0].id);",
+									"        console.log('ID da associação perfil-funcionalidade criada salvo:', response[0].id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n  {\n    \"profileId\": {{created_profile_id}},\n    \"functionalityId\": {{created_functionality_id}}\n  }\n]"
+						},
+						"url": {
+							"raw": "{{base_url}}/profile-functionalities",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"profile-functionalities"
+							]
+						},
+						"description": "Associa funcionalidades a um perfil (aceita array de associações)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Profile Functionalities",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/profile-functionalities",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"profile-functionalities"
+							]
+						},
+						"description": "Lista todas as associações entre perfis e funcionalidades"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Functionalities by Profile",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/profile-functionalities/{{created_profile_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"profile-functionalities",
+								"{{created_profile_id}}"
+							]
+						},
+						"description": "Lista todas as funcionalidades de um perfil específico"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Profile Functionality",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/profile-functionalities/{{created_profile_functionality_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"profile-functionalities",
+								"{{created_profile_functionality_id}}"
+							]
+						},
+						"description": "Remove uma associação entre perfil e funcionalidade"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints relacionados à associação entre perfis e funcionalidades"
+		},
+		{
+			"name": "User Profiles",
+			"item": [
+				{
+					"name": "Create User Profile",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Salva o ID da associação usuário-perfil criada",
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('created_user_profile_id', response.id);",
+									"    console.log('ID da associação usuário-perfil criada salvo:', response.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userUuid\": \"{{user_uuid}}\",\n  \"profileId\": {{created_profile_id}}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/user_profiles",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user_profiles"
+							]
+						},
+						"description": "Associa um perfil a um usuário"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Profiles by User UUID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/user_profiles/profiles/{{user_uuid}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user_profiles",
+								"profiles",
+								"{{user_uuid}}"
+							]
+						},
+						"description": "Lista todos os perfis de um usuário específico"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Functionalities by User UUID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/user_profiles/profiles/{{user_uuid}}/functionalities",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user_profiles",
+								"profiles",
+								"{{user_uuid}}",
+								"functionalities"
+							]
+						},
+						"description": "Lista todas as funcionalidades disponíveis para um usuário específico"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Users by Profile ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/user_profiles/users/{{created_profile_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user_profiles",
+								"users",
+								"{{created_profile_id}}"
+							]
+						},
+						"description": "Lista todos os usuários que possuem um perfil específico"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User Profile",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/user_profiles/{{created_user_profile_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user_profiles",
+								"{{created_user_profile_id}}"
+							]
+						},
+						"description": "Remove uma associação entre usuário e perfil"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints relacionados à associação entre usuários e perfis"
 		},
 		{
 			"name": "App Info",
@@ -528,6 +997,11 @@
 		},
 		{
 			"key": "created_profile_functionality_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "created_user_profile_id",
 			"value": "",
 			"type": "string"
 		}

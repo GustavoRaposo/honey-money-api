@@ -61,7 +61,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ProfileFunctionalitiesController.prototype, "remove", null);
 exports.ProfileFunctionalitiesController = ProfileFunctionalitiesController = __decorate([
-    (0, common_1.Controller)('profile-funcionalities'),
+    (0, common_1.Controller)('profile-functionalities'),
     __metadata("design:paramtypes", [profile_functionalities_service_1.ProfileFunctionalitiesService])
 ], ProfileFunctionalitiesController);
 //# sourceMappingURL=profile-functionalities.controller.js.map

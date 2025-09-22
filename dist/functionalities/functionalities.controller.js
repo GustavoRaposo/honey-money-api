@@ -74,7 +74,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], FunctionalitiesController.prototype, "remove", null);
 exports.FunctionalitiesController = FunctionalitiesController = __decorate([
-    (0, common_1.Controller)('funcionalities'),
+    (0, common_1.Controller)('functionalities'),
     __metadata("design:paramtypes", [functionalities_service_1.FunctionalitiesService])
 ], FunctionalitiesController);
 //# sourceMappingURL=functionalities.controller.js.map

@@ -16,6 +16,7 @@ const auth_module_1 = require("./auth/auth.module");
 const profiles_module_1 = require("./profiles/profiles.module");
 const functionalities_module_1 = require("./functionalities/functionalities.module");
 const profile_functionalities_module_1 = require("./profile-functionalities/profile-functionalities.module");
+const user_profiles_module_1 = require("./user-profiles/user-profiles.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -27,7 +28,8 @@ exports.AppModule = AppModule = __decorate([
             auth_module_1.AuthModule,
             profiles_module_1.ProfilesModule,
             functionalities_module_1.FunctionalitiesModule,
-            profile_functionalities_module_1.ProfileFunctionalitiesModule
+            profile_functionalities_module_1.ProfileFunctionalitiesModule,
+            user_profiles_module_1.UserProfilesModule
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

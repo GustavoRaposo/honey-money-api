@@ -16,6 +16,7 @@ model User {
   tokenExpiry  DateTime? @map("token_expiry")
   createdAt    DateTime  @default(now()) @map("create_at")
   updatedAt    DateTime  @updatedAt @map("update_at")
+  userProfiles UserProfile[]
 
   @@map("user")
 }
@@ -26,6 +27,7 @@ model Profile {
   createdAt              DateTime                @default(now()) @map("created_at")
   updatedAt              DateTime                @updatedAt @map("updated_at")
   profileFunctionalities ProfileFunctionality[]
+  userProfiles           UserProfile[]
 
   @@map("profile")
 }
@@ -53,4 +55,18 @@ model ProfileFunctionality {
 
   @@unique([profileId, functionalityId])
   @@map("profile_functionality")
+}
+
+model UserProfile {
+  id              Int           @id @default(autoincrement())
+  userUuid        String        @map("user_uuid")
+  profileId       Int           @map("profile_id")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  user            User          @relation(fields: [userUuid], references: [uuid], onDelete: Cascade)
+  profile         Profile       @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([userUuid, profileId])
+  @@map("user_profile")
 }

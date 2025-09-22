@@ -1,0 +1,1225 @@
+openapi: 3.0.0
+info:
+  title: Honey Money API
+  description: API completa para gerenciamento do sistema Honey Money com autenticação JWT, gerenciamento de usuários, perfis e funcionalidades
+  version: 1.0.0
+  contact:
+    name: Honey Money Team
+    email: support@honeymoney.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:3000
+    description: Servidor de desenvolvimento
+  - url: https://api.honeymoney.com
+    description: Servidor de produção
+
+tags:
+  - name: App
+    description: Endpoints gerais da aplicação
+  - name: Authentication
+    description: Endpoints relacionados à autenticação JWT
+  - name: Users
+    description: Endpoints relacionados ao gerenciamento de usuários
+  - name: Profiles
+    description: Endpoints relacionados ao gerenciamento de perfis de usuário
+  - name: Functionalities
+    description: Endpoints relacionados ao gerenciamento de funcionalidades do sistema
+  - name: Profile Functionalities
+    description: Endpoints relacionados à associação entre perfis e funcionalidades
+  - name: User Profiles
+    description: Endpoints relacionados à associação entre usuários e perfis
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Token JWT para autenticação
+
+  schemas:
+    User:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: UUID único do usuário
+        name:
+          type: string
+          description: Nome completo do usuário
+        email:
+          type: string
+          format: email
+          description: Email do usuário
+        createdAt:
+          type: string
+          format: date-time
+          description: Data de criação do usuário
+        updatedAt:
+          type: string
+          format: date-time
+          description: Data de última atualização do usuário
+
+    CreateUserDto:
+      type: object
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+          description: Nome completo do usuário
+          example: "João Silva"
+        email:
+          type: string
+          format: email
+          description: Email do usuário
+          example: "joao@example.com"
+        password:
+          type: string
+          format: password
+          description: Senha do usuário
+          example: "senha123"
+
+    UpdateUserDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Nome completo do usuário
+          example: "João Silva Atualizado"
+        email:
+          type: string
+          format: email
+          description: Email do usuário
+          example: "joao.novo@example.com"
+        password:
+          type: string
+          format: password
+          description: Nova senha do usuário
+          example: "novaSenha123"
+
+    SearchUserDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Filtro por nome (busca parcial)
+          example: "João"
+        email:
+          type: string
+          description: Filtro por email (busca parcial)
+          example: "joao"
+
+    LoginDto:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          description: Email do usuário
+          example: "test@example.com"
+        password:
+          type: string
+          format: password
+          description: Senha do usuário
+          example: "123456"
+
+    AuthResponseDto:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: Token JWT de acesso
+        refresh_token:
+          type: string
+          description: Token de refresh para renovar o access token
+        expires_in:
+          type: number
+          description: Tempo de expiração do access token em segundos
+        user:
+          $ref: '#/components/schemas/User'
+
+    RefreshTokenDto:
+      type: object
+      required:
+        - refresh_token
+      properties:
+        refresh_token:
+          type: string
+          description: Token de refresh para renovar o access token
+
+    Profile:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID único do perfil
+        name:
+          type: string
+          description: Nome do perfil
+        createdAt:
+          type: string
+          format: date-time
+          description: Data de criação do perfil
+        updatedAt:
+          type: string
+          format: date-time
+          description: Data de última atualização do perfil
+
+    CreateProfileDto:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Nome do perfil
+          example: "Administrador"
+
+    UpdateProfileDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Nome do perfil
+          example: "Super Administrador"
+
+    Functionality:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID único da funcionalidade
+        name:
+          type: string
+          description: Nome da funcionalidade
+        description:
+          type: string
+          description: Descrição da funcionalidade
+        createdAt:
+          type: string
+          format: date-time
+          description: Data de criação da funcionalidade
+        updatedAt:
+          type: string
+          format: date-time
+          description: Data de última atualização da funcionalidade
+
+    CreateFunctionalityDto:
+      type: object
+      required:
+        - name
+        - description
+      properties:
+        name:
+          type: string
+          description: Nome da funcionalidade
+          example: "Gerenciar Usuários"
+        description:
+          type: string
+          description: Descrição da funcionalidade
+          example: "Permite criar, editar e excluir usuários do sistema"
+
+    UpdateFunctionalityDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Nome da funcionalidade
+          example: "Gerenciar Usuários Avançado"
+        description:
+          type: string
+          description: Descrição da funcionalidade
+          example: "Permite criar, editar, excluir e gerenciar permissões de usuários do sistema"
+
+    ProfileFunctionality:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID único da associação
+        profileId:
+          type: integer
+          description: ID do perfil
+        functionalityId:
+          type: integer
+          description: ID da funcionalidade
+        profile:
+          $ref: '#/components/schemas/Profile'
+        functionality:
+          $ref: '#/components/schemas/Functionality'
+        createdAt:
+          type: string
+          format: date-time
+          description: Data de criação da associação
+
+    CreateProfileFunctionalityDto:
+      type: object
+      required:
+        - profileId
+        - functionalityId
+      properties:
+        profileId:
+          type: integer
+          description: ID do perfil
+          example: 1
+        functionalityId:
+          type: integer
+          description: ID da funcionalidade
+          example: 1
+
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID único da associação
+        userUuid:
+          type: string
+          format: uuid
+          description: UUID do usuário
+        profileId:
+          type: integer
+          description: ID do perfil
+        user:
+          $ref: '#/components/schemas/User'
+        profile:
+          $ref: '#/components/schemas/Profile'
+        createdAt:
+          type: string
+          format: date-time
+          description: Data de criação da associação
+
+    CreateUserProfileDto:
+      type: object
+      required:
+        - userUuid
+        - profileId
+      properties:
+        userUuid:
+          type: string
+          format: uuid
+          description: UUID do usuário
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        profileId:
+          type: integer
+          description: ID do perfil
+          example: 1
+
+    Error:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          description: Código de status HTTP
+        message:
+          type: string
+          description: Mensagem de erro
+        error:
+          type: string
+          description: Tipo do erro
+
+    ValidationError:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 400
+        message:
+          type: array
+          items:
+            type: string
+          description: Lista de erros de validação
+        error:
+          type: string
+          example: "Bad Request"
+
+paths:
+  /:
+    get:
+      tags:
+        - App
+      summary: Health Check
+      description: Verifica se a API está funcionando
+      responses:
+        '200':
+          description: API está funcionando
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Hello World!"
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login do usuário
+      description: Autentica o usuário e retorna tokens JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginDto'
+      responses:
+        '200':
+          description: Login realizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponseDto'
+        '401':
+          description: Credenciais inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/profile:
+    get:
+      tags:
+        - Authentication
+      summary: Obter perfil do usuário autenticado
+      description: Retorna o perfil do usuário autenticado
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Perfil do usuário
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Token inválido ou expirado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/validate:
+    post:
+      tags:
+        - Authentication
+      summary: Validar token JWT
+      description: Valida se o token JWT é válido
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Token válido
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valid:
+                    type: boolean
+                    example: true
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          description: Token inválido ou expirado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Renovar token de acesso
+      description: Renova o access token usando o refresh token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenDto'
+      responses:
+        '200':
+          description: Tokens renovados com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponseDto'
+        '401':
+          description: Refresh token inválido ou expirado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Logout do usuário
+      description: Faz logout e revoga o refresh token
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Logout realizado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Logged out successfully"
+        '401':
+          description: Token inválido ou expirado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users:
+    post:
+      tags:
+        - Users
+      summary: Criar novo usuário
+      description: Cria um novo usuário (rota pública)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserDto'
+      responses:
+        '201':
+          description: Usuário criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Dados de entrada inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '409':
+          description: Email já está em uso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    get:
+      tags:
+        - Users
+      summary: Listar todos os usuários
+      description: Lista todos os usuários (requer autenticação)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de usuários
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '401':
+          description: Token inválido ou expirado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/search:
+    get:
+      tags:
+        - Users
+      summary: Buscar usuários
+      description: Busca usuários por nome e/ou email (requer autenticação)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: name
+          in: query
+          description: Filtro por nome (busca parcial)
+          schema:
+            type: string
+            example: "João"
+        - name: email
+          in: query
+          description: Filtro por email (busca parcial)
+          schema:
+            type: string
+            example: "joao"
+      responses:
+        '200':
+          description: Lista de usuários encontrados
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '401':
+          description: Token inválido ou expirado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/{uuid}:
+    get:
+      tags:
+        - Users
+      summary: Obter usuário por UUID
+      description: Busca um usuário específico pelo UUID (requer autenticação)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          description: UUID do usuário
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Dados do usuário
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Token inválido ou expirado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Usuário não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      tags:
+        - Users
+      summary: Atualizar usuário
+      description: Atualiza dados de um usuário (requer autenticação)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          description: UUID do usuário
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserDto'
+      responses:
+        '200':
+          description: Usuário atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Dados de entrada inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Token inválido ou expirado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Usuário não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      tags:
+        - Users
+      summary: Deletar usuário
+      description: Deleta um usuário (requer autenticação)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          description: UUID do usuário
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Usuário deletado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Usuário deletado com sucesso"
+        '401':
+          description: Token inválido ou expirado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Usuário não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /profiles:
+    post:
+      tags:
+        - Profiles
+      summary: Criar novo perfil
+      description: Cria um novo perfil de usuário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProfileDto'
+      responses:
+        '201':
+          description: Perfil criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+        '400':
+          description: Dados de entrada inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+    get:
+      tags:
+        - Profiles
+      summary: Listar todos os perfis
+      description: Lista todos os perfis disponíveis
+      responses:
+        '200':
+          description: Lista de perfis
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Profile'
+
+  /profiles/{id}:
+    get:
+      tags:
+        - Profiles
+      summary: Obter perfil por ID
+      description: Busca um perfil específico pelo ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID do perfil
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Dados do perfil
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+        '404':
+          description: Perfil não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      tags:
+        - Profiles
+      summary: Atualizar perfil
+      description: Atualiza um perfil existente
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID do perfil
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileDto'
+      responses:
+        '200':
+          description: Perfil atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+        '400':
+          description: Dados de entrada inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '404':
+          description: Perfil não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      tags:
+        - Profiles
+      summary: Deletar perfil
+      description: Remove um perfil
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID do perfil
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Perfil deletado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Perfil deletado com sucesso"
+        '404':
+          description: Perfil não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /functionalities:
+    post:
+      tags:
+        - Functionalities
+      summary: Criar nova funcionalidade
+      description: Cria uma nova funcionalidade do sistema
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFunctionalityDto'
+      responses:
+        '201':
+          description: Funcionalidade criada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Functionality'
+        '400':
+          description: Dados de entrada inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+    get:
+      tags:
+        - Functionalities
+      summary: Listar todas as funcionalidades
+      description: Lista todas as funcionalidades disponíveis
+      responses:
+        '200':
+          description: Lista de funcionalidades
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Functionality'
+
+  /functionalities/{id}:
+    get:
+      tags:
+        - Functionalities
+      summary: Obter funcionalidade por ID
+      description: Busca uma funcionalidade específica pelo ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID da funcionalidade
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Dados da funcionalidade
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Functionality'
+        '404':
+          description: Funcionalidade não encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      tags:
+        - Functionalities
+      summary: Atualizar funcionalidade
+      description: Atualiza uma funcionalidade existente
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID da funcionalidade
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFunctionalityDto'
+      responses:
+        '200':
+          description: Funcionalidade atualizada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Functionality'
+        '400':
+          description: Dados de entrada inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '404':
+          description: Funcionalidade não encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      tags:
+        - Functionalities
+      summary: Deletar funcionalidade
+      description: Remove uma funcionalidade
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID da funcionalidade
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Funcionalidade deletada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Funcionalidade deletada com sucesso"
+        '404':
+          description: Funcionalidade não encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /profile-functionalities:
+    post:
+      tags:
+        - Profile Functionalities
+      summary: Criar associação perfil-funcionalidade
+      description: Associa funcionalidades a um perfil (aceita array de associações)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/CreateProfileFunctionalityDto'
+      responses:
+        '201':
+          description: Associações criadas com sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProfileFunctionality'
+        '400':
+          description: Dados de entrada inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+    get:
+      tags:
+        - Profile Functionalities
+      summary: Listar todas as associações perfil-funcionalidade
+      description: Lista todas as associações entre perfis e funcionalidades
+      responses:
+        '200':
+          description: Lista de associações
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProfileFunctionality'
+
+  /profile-functionalities/{profile}:
+    get:
+      tags:
+        - Profile Functionalities
+      summary: Obter funcionalidades por perfil
+      description: Lista todas as funcionalidades de um perfil específico
+      parameters:
+        - name: profile
+          in: path
+          required: true
+          description: ID do perfil
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista de funcionalidades do perfil
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProfileFunctionality'
+        '404':
+          description: Perfil não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /profile-functionalities/{id}:
+    delete:
+      tags:
+        - Profile Functionalities
+      summary: Deletar associação perfil-funcionalidade
+      description: Remove uma associação entre perfil e funcionalidade
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID da associação
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Associação deletada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Associação deletada com sucesso"
+        '404':
+          description: Associação não encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /user_profiles:
+    post:
+      tags:
+        - User Profiles
+      summary: Criar associação usuário-perfil
+      description: Associa um perfil a um usuário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserProfileDto'
+      responses:
+        '201':
+          description: Associação criada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '400':
+          description: Dados de entrada inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+  /user_profiles/profiles/{uuid}:
+    get:
+      tags:
+        - User Profiles
+      summary: Obter perfis por UUID do usuário
+      description: Lista todos os perfis de um usuário específico
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          description: UUID do usuário
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Lista de perfis do usuário
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserProfile'
+        '404':
+          description: Usuário não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /user_profiles/profiles/{uuid}/functionalities:
+    get:
+      tags:
+        - User Profiles
+      summary: Obter funcionalidades por UUID do usuário
+      description: Lista todas as funcionalidades disponíveis para um usuário específico
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          description: UUID do usuário
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Lista de funcionalidades do usuário
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Functionality'
+        '404':
+          description: Usuário não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /user_profiles/users/{id}:
+    get:
+      tags:
+        - User Profiles
+      summary: Obter usuários por ID do perfil
+      description: Lista todos os usuários que possuem um perfil específico
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID do perfil
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista de usuários com o perfil
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserProfile'
+        '404':
+          description: Perfil não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /user_profiles/{id}:
+    delete:
+      tags:
+        - User Profiles
+      summary: Deletar associação usuário-perfil
+      description: Remove uma associação entre usuário e perfil
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID da associação
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Associação deletada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Associação deletada com sucesso"
+        '404':
+          description: Associação não encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'

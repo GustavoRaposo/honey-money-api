@@ -12,7 +12,7 @@ import { FunctionalitiesService } from './functionalities.service';
 import { CreateFunctionalityDto } from './dto/create-functionality.dto';
 import { UpdateFunctionalityDto } from './dto/update-functionality.dto';
 
-@Controller('funcionalities')
+@Controller('functionalities')
 export class FunctionalitiesController {
   constructor(private readonly functionalitiesService: FunctionalitiesService) {}
 
