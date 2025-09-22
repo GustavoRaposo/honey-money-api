@@ -1,16 +1,16 @@
 import { JwtService } from '@nestjs/jwt';
-import { UserService } from '../user/user.service';
+import { UsersService } from '../users/users.service';
 import { AuthResponseDto } from './dto/auth-response.dto';
 export declare class AuthService {
-    private userService;
+    private usersService;
     private jwtService;
-    constructor(userService: UserService, jwtService: JwtService);
+    constructor(usersService: UsersService, jwtService: JwtService);
     validateUser(email: string, password: string): Promise<any>;
     login(user: any): Promise<AuthResponseDto>;
     validateToken(payload: any): Promise<{
-        name: string;
-        email: string;
         uuid: string;
+        email: string;
+        name: string;
         createdAt: Date;
         updatedAt: Date;
     }>;

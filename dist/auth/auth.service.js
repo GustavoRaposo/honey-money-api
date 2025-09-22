@@ -12,15 +12,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
-const user_service_1 = require("../user/user.service");
+const users_service_1 = require("../users/users.service");
 const crypto_1 = require("crypto");
 let AuthService = class AuthService {
-    constructor(userService, jwtService) {
-        this.userService = userService;
+    constructor(usersService, jwtService) {
+        this.usersService = usersService;
         this.jwtService = jwtService;
     }
     async validateUser(email, password) {
-        return this.userService.validateUser(email, password);
+        return this.usersService.validateUser(email, password);
     }
     async login(user) {
         const payload = {
@@ -29,7 +29,7 @@ let AuthService = class AuthService {
             name: user.name,
         };
         const refreshToken = (0, crypto_1.randomUUID)();
-        await this.userService.saveRefreshToken(user.uuid, refreshToken);
+        await this.usersService.saveRefreshToken(user.uuid, refreshToken);
         return {
             access_token: this.jwtService.sign(payload),
             refresh_token: refreshToken,
@@ -42,10 +42,10 @@ let AuthService = class AuthService {
         };
     }
     async validateToken(payload) {
-        return this.userService.findByEmail(payload.email);
+        return this.usersService.findByEmail(payload.email);
     }
     async refreshToken(refreshToken) {
-        const user = await this.userService.findByRefreshToken(refreshToken);
+        const user = await this.usersService.findByRefreshToken(refreshToken);
         if (!user) {
             throw new common_1.UnauthorizedException('Invalid refresh token');
         }
@@ -55,7 +55,7 @@ let AuthService = class AuthService {
             name: user.name,
         };
         const newRefreshToken = (0, crypto_1.randomUUID)();
-        await this.userService.saveRefreshToken(user.uuid, newRefreshToken);
+        await this.usersService.saveRefreshToken(user.uuid, newRefreshToken);
         return {
             access_token: this.jwtService.sign(payload),
             refresh_token: newRefreshToken,
@@ -68,13 +68,13 @@ let AuthService = class AuthService {
         };
     }
     async logout(uuid) {
-        await this.userService.revokeRefreshToken(uuid);
+        await this.usersService.revokeRefreshToken(uuid);
     }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [user_service_1.UserService,
+    __metadata("design:paramtypes", [users_service_1.UsersService,
         jwt_1.JwtService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

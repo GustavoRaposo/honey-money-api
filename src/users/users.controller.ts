@@ -10,37 +10,37 @@ import {
   ValidationPipe,
   UseGuards,
 } from '@nestjs/common';
-import { UserService } from './user.service';
+import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { SearchUserDto } from './dto/search-user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
-@Controller('user')
-export class UserController {
-  constructor(private readonly userService: UserService) {}
+@Controller('users')
+export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
 
   @Post()
   create(@Body(ValidationPipe) createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+    return this.usersService.create(createUserDto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get()
   findAll() {
-    return this.userService.findAll();
+    return this.usersService.findAll();
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('search')
   search(@Query(ValidationPipe) searchUserDto: SearchUserDto) {
-    return this.userService.search(searchUserDto);
+    return this.usersService.search(searchUserDto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get(':uuid')
   findOne(@Param('uuid') uuid: string) {
-    return this.userService.findOne(uuid);
+    return this.usersService.findOne(uuid);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -49,12 +49,12 @@ export class UserController {
     @Param('uuid') uuid: string,
     @Body(ValidationPipe) updateUserDto: UpdateUserDto,
   ) {
-    return this.userService.update(uuid, updateUserDto);
+    return this.usersService.update(uuid, updateUserDto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':uuid')
   remove(@Param('uuid') uuid: string) {
-    return this.userService.remove(uuid);
+    return this.usersService.remove(uuid);
   }
 }

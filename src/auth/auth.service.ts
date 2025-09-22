@@ -1,18 +1,18 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserService } from '../user/user.service';
+import { UsersService } from '../users/users.service';
 import { AuthResponseDto } from './dto/auth-response.dto';
 import { randomUUID } from 'crypto';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private userService: UserService,
+    private usersService: UsersService,
     private jwtService: JwtService,
   ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
-    return this.userService.validateUser(email, password);
+    return this.usersService.validateUser(email, password);
   }
 
   async login(user: any): Promise<AuthResponseDto> {
@@ -24,9 +24,9 @@ export class AuthService {
 
     // Gerar refresh token
     const refreshToken = randomUUID();
-    
+
     // Salvar refresh token no banco
-    await this.userService.saveRefreshToken(user.uuid, refreshToken);
+    await this.usersService.saveRefreshToken(user.uuid, refreshToken);
 
     return {
       access_token: this.jwtService.sign(payload),
@@ -41,13 +41,13 @@ export class AuthService {
   }
 
   async validateToken(payload: any) {
-    return this.userService.findByEmail(payload.email);
+    return this.usersService.findByEmail(payload.email);
   }
 
   async refreshToken(refreshToken: string): Promise<AuthResponseDto> {
     // Verificar se o refresh token é válido
-    const user = await this.userService.findByRefreshToken(refreshToken);
-    
+    const user = await this.usersService.findByRefreshToken(refreshToken);
+
     if (!user) {
       throw new UnauthorizedException('Invalid refresh token');
     }
@@ -61,9 +61,9 @@ export class AuthService {
 
     // Gerar novo refresh token
     const newRefreshToken = randomUUID();
-    
+
     // Atualizar refresh token no banco
-    await this.userService.saveRefreshToken(user.uuid, newRefreshToken);
+    await this.usersService.saveRefreshToken(user.uuid, newRefreshToken);
 
     return {
       access_token: this.jwtService.sign(payload),
@@ -78,6 +78,6 @@ export class AuthService {
   }
 
   async logout(uuid: string): Promise<void> {
-    await this.userService.revokeRefreshToken(uuid);
+    await this.usersService.revokeRefreshToken(uuid);
   }
 }
