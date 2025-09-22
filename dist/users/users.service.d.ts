@@ -6,39 +6,39 @@ export declare class UsersService {
     private prisma;
     constructor(prisma: PrismaService);
     create(createUserDto: CreateUserDto): Promise<{
-        uuid: string;
         name: string;
         email: string;
+        uuid: string;
         refreshToken: string | null;
         tokenExpiry: Date | null;
         createdAt: Date;
         updatedAt: Date;
     }>;
     findAll(): Promise<{
-        uuid: string;
         name: string;
         email: string;
+        uuid: string;
         createdAt: Date;
         updatedAt: Date;
     }[]>;
     findOne(uuid: string): Promise<{
-        uuid: string;
         name: string;
         email: string;
+        uuid: string;
         createdAt: Date;
         updatedAt: Date;
     }>;
     search(searchUserDto: SearchUserDto): Promise<{
-        uuid: string;
         name: string;
         email: string;
+        uuid: string;
         createdAt: Date;
         updatedAt: Date;
     }[]>;
     update(uuid: string, updateUserDto: UpdateUserDto): Promise<{
-        uuid: string;
         name: string;
         email: string;
+        uuid: string;
         createdAt: Date;
         updatedAt: Date;
     }>;
@@ -46,46 +46,46 @@ export declare class UsersService {
         message: string;
     }>;
     validateUser(email: string, password: string): Promise<{
-        uuid: string;
         name: string;
         email: string;
+        uuid: string;
         refreshToken: string | null;
         tokenExpiry: Date | null;
         createdAt: Date;
         updatedAt: Date;
     }>;
     findByEmail(email: string): Promise<{
-        uuid: string;
         name: string;
         email: string;
+        uuid: string;
         createdAt: Date;
         updatedAt: Date;
     }>;
     saveRefreshToken(uuid: string, refreshToken: string): Promise<{
-        uuid: string;
         name: string;
         email: string;
         password: string;
+        uuid: string;
         refreshToken: string | null;
         tokenExpiry: Date | null;
         createdAt: Date;
         updatedAt: Date;
     }>;
     findByRefreshToken(refreshToken: string): Promise<{
-        uuid: string;
         name: string;
         email: string;
         password: string;
+        uuid: string;
         refreshToken: string | null;
         tokenExpiry: Date | null;
         createdAt: Date;
         updatedAt: Date;
     }>;
     revokeRefreshToken(uuid: string): Promise<{
-        uuid: string;
         name: string;
         email: string;
         password: string;
+        uuid: string;
         refreshToken: string | null;
         tokenExpiry: Date | null;
         createdAt: Date;

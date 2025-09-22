@@ -8,9 +8,9 @@ export declare class AuthService {
     validateUser(email: string, password: string): Promise<any>;
     login(user: any): Promise<AuthResponseDto>;
     validateToken(payload: any): Promise<{
-        uuid: string;
-        email: string;
         name: string;
+        email: string;
+        uuid: string;
         createdAt: Date;
         updatedAt: Date;
     }>;

@@ -515,6 +515,21 @@
 			"key": "expires_in",
 			"value": "",
 			"type": "string"
+		},
+		{
+			"key": "created_profile_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "created_functionality_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "created_profile_functionality_id",
+			"value": "",
+			"type": "string"
 		}
 	]
 }
