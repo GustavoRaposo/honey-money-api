@@ -1,0 +1,520 @@
+{
+	"info": {
+		"_postman_id": "honey-money-api-collection",
+		"name": "Honey Money API",
+		"description": "Collection completa da API Honey Money com sistema de autenticação JWT",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Salva os tokens JWT e refresh automaticamente",
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('jwt_token', response.access_token);",
+									"    pm.environment.set('refresh_token', response.refresh_token);",
+									"    pm.environment.set('expires_in', response.expires_in);",
+									"    pm.environment.set('user_uuid', response.user.uuid);",
+									"    pm.environment.set('user_email', response.user.email);",
+									"    pm.environment.set('user_name', response.user.name);",
+									"    console.log('Tokens JWT e Refresh salvos automaticamente!');",
+									"    console.log('Access Token expira em:', response.expires_in, 'segundos');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Faz login do usuário e retorna JWT token"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"profile"
+							]
+						},
+						"description": "Retorna o perfil do usuário autenticado"
+					},
+					"response": []
+				},
+				{
+					"name": "Validate Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/validate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"validate"
+							]
+						},
+						"description": "Valida se o token JWT é válido"
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Salva os novos tokens automaticamente",
+									"if (pm.response.code === 200 || pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('jwt_token', response.access_token);",
+									"    pm.environment.set('refresh_token', response.refresh_token);",
+									"    pm.environment.set('expires_in', response.expires_in);",
+									"    console.log('Novos tokens salvos automaticamente!');",
+									"    console.log('Novo Access Token expira em:', response.expires_in, 'segundos');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/refresh",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"refresh"
+							]
+						},
+						"description": "Renova o access token usando o refresh token"
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Limpa os tokens após logout",
+									"if (pm.response.code === 200 || pm.response.code === 201) {",
+									"    pm.environment.set('jwt_token', '');",
+									"    pm.environment.set('refresh_token', '');",
+									"    pm.environment.set('expires_in', '');",
+									"    console.log('Tokens removidos após logout!');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"logout"
+							]
+						},
+						"description": "Faz logout e revoga o refresh token"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints relacionados à autenticação JWT"
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Create User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Salva o UUID do usuário criado",
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('created_user_uuid', response.uuid);",
+									"    console.log('UUID do usuário criado salvo:', response.uuid);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"João Silva\",\n  \"email\": \"joao@example.com\",\n  \"password\": \"senha123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/user",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user"
+							]
+						},
+						"description": "Cria um novo usuário (rota pública)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/user",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user"
+							]
+						},
+						"description": "Lista todos os usuários (requer autenticação)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by UUID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/user/{{user_uuid}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user",
+								"{{user_uuid}}"
+							]
+						},
+						"description": "Busca um usuário específico pelo UUID (requer autenticação)"
+					},
+					"response": []
+				},
+				{
+					"name": "Search Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/user/search?name=João&email=joao",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user",
+								"search"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "João",
+									"description": "Filtro por nome (opcional)"
+								},
+								{
+									"key": "email",
+									"value": "joao",
+									"description": "Filtro por email (opcional)"
+								}
+							]
+						},
+						"description": "Busca usuários por nome e/ou email (requer autenticação)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"João Silva Atualizado\",\n  \"email\": \"joao.novo@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/user/{{user_uuid}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user",
+								"{{user_uuid}}"
+							]
+						},
+						"description": "Atualiza dados de um usuário (requer autenticação)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update User Password",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"password\": \"novaSenha123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/user/{{user_uuid}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user",
+								"{{user_uuid}}"
+							]
+						},
+						"description": "Atualiza apenas a senha do usuário (requer autenticação)"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/user/{{created_user_uuid}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user",
+								"{{created_user_uuid}}"
+							]
+						},
+						"description": "Deleta um usuário (requer autenticação)"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints relacionados ao gerenciamento de usuários"
+		},
+		{
+			"name": "App Info",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								""
+							]
+						},
+						"description": "Verifica se a API está funcionando"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints gerais da aplicação"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Script executado antes de cada requisição",
+					"console.log('Executando requisição para:', pm.request.url);"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Script executado após cada requisição",
+					"console.log('Status da resposta:', pm.response.code);",
+					"console.log('Tempo de resposta:', pm.response.responseTime + 'ms');"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "jwt_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "user_uuid",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "user_email",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "user_name",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "created_user_uuid",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refresh_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "expires_in",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
